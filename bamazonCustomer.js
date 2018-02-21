@@ -11,6 +11,7 @@ const connection = mysql.createConnection({
 });
 
 let productTotal = 0;
+let itemId = 0;
 let itemQuantity = 0;
 
 connection.connect(function(err) {
@@ -21,8 +22,8 @@ connection.connect(function(err) {
   displayProducts();
 });
 
-// Function to return the number of products
-function updateProductTotal() {
+// Function to get the number of products available
+function getProductTotal() {
   connection.query("SELECT item_id FROM products", function(err, res) {
     if (err) throw err;
     productTotal =  res[res.length-1].item_id;
@@ -30,11 +31,29 @@ function updateProductTotal() {
   });
 }
 
-function updateItemQuantity(id) {
+// Function to get the quantity of the selected item
+function getItemQuantity(id) {
   connection.query("SELECT item_id, stock_quantity FROM products WHERE ?", {item_id: id}, function(err, res) {
     if (err) throw err;
     itemQuantity =  res[0].stock_quantity;
     // console.log(itemQuantity);
+  });
+}
+
+// Function to update thte quantity of the selected item
+function updateItemQuantity(id, quant) {
+  itemQuantity += quant;
+  connection.query("UPDATE products SET ? WHERE ?", [{stock_quantity: itemQuantity}, {item_id: id}], function (err, result) {
+    if (err) throw err;
+    // console.log(result.affectedRows + " record(s) updated");
+  });
+}
+
+// Function to calcuate the amount of a purchase
+function calculatePurchaseTotal(id, quant) {
+  connection.query("SELECT item_id, price FROM products WHERE ?", {item_id: id}, function(err, res) {
+    if (err) throw err;
+    console.log("\nYour purchase was successful. Total order amount: $" + (quant * res[0].price).toFixed(2) + '\n');
   });
 }
 
@@ -78,7 +97,7 @@ function promptId() {
     },
   ]).then(function(res) {
     // Get stock of item
-    updateItemQuantity(res.id);
+    getItemQuantity(res.id);
     // Prompt user for quantity of item
     promptQuantity(res.id);
   });
@@ -100,16 +119,15 @@ function promptQuantity(id) {
       }
     },
   ]).then(function(res) {
-    console.log('product id:', id, '\nquantity to buy:', res.quantity);
+    calculatePurchaseTotal(id, res.quantity);
+    updateItemQuantity(id, -res.quantity);
     disconnect();
   });
 }
 
 // Function to log a table of available products to the customer
 function displayProducts() {
-  updateProductTotal();
-
-  console.log('Products:\n');
+  getProductTotal();
   connection.query("SELECT * FROM products", function(err, res) {
     if (err) throw err;
     let itemArr = [];
@@ -120,7 +138,7 @@ function displayProducts() {
           quantity: curr.stock_quantity }
       );
     });
-    console.log(asTable (itemArr) + '\n');
+    console.log('Products:\n' + asTable (itemArr) + '\n');
 
     // Prompt user for an item ID
     promptId();
