@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 const asTable = require ('as-table').configure ({ delimiter: ' | ' });
+const isNumber = require('is-number');
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -50,10 +51,10 @@ function updateItemQuantity(id, quant) {
 }
 
 // Function to calcuate the amount of a purchase
-function calculatePurchaseTotal(id, quant) {
+function displayPurchaseTotal(id, quant) {
   connection.query("SELECT item_id, price FROM products WHERE ?", {item_id: id}, function(err, res) {
     if (err) throw err;
-    console.log("\nYour purchase was successful. Total order amount: $" + (quant * res[0].price).toFixed(2) + '\n');
+    console.log("\nYour purchase was successful!\n\nTotal order amount: $" + (quant * res[0].price).toFixed(2) + '\n');
   });
 }
 
@@ -88,7 +89,7 @@ function promptId() {
       type: "input",
       message: "Which item would you like to select?",
       validate: function(id) {
-        if (validateId(parseInt(id))) {
+        if (isNumber(id) && validateId(parseInt(id))) {
           return true;
         } else {
           return false;
@@ -111,7 +112,7 @@ function promptQuantity(id) {
       type: "input",
       message: "How many would you like to purchase?",
       validate: function(quant) {
-        if (validateQuant(parseInt(quant))) {
+        if (isNumber(id) && validateQuant(parseInt(quant))) {
           return true;
         } else {
           return false;
@@ -119,8 +120,13 @@ function promptQuantity(id) {
       }
     },
   ]).then(function(res) {
-    calculatePurchaseTotal(id, res.quantity);
+    // Display total amount for the purchase
+    displayPurchaseTotal(id, res.quantity);
+
+    // Update item quantity in database
     updateItemQuantity(id, -res.quantity);
+
+    // Disconnect from database
     disconnect();
   });
 }
