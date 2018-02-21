@@ -55,6 +55,8 @@ function displayPurchaseTotal(id, quant) {
   connection.query("SELECT item_id, price FROM products WHERE ?", {item_id: id}, function(err, res) {
     if (err) throw err;
     console.log("\nYour purchase was successful!\n\nTotal order amount: $" + (quant * res[0].price).toFixed(2) + '\n');
+    // TODO: Add connection.query to update product_sales with order amount
+    
   });
 }
 

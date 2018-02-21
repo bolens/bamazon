@@ -12,4 +12,14 @@ CREATE TABLE products (
   PRIMARY KEY (item_id)
 );
 
+CREATE TABLE departments (
+  department_id INT NOT NULL AUTO_INCREMENT,
+  department_name VARCHAR(100) NULL,
+  over_head_costs INT NULL,
+  PRIMARY KEY (department_id)
+);
+
+ALTER TABLE products ADD product_sales INT NULL;
+
 SELECT * FROM products;
+SELECT * FROM departments;
