@@ -1,11 +1,11 @@
 # bamazon
 
 ## bamazonCustomer
-Customer view
+### Customer view
 ![Bamazon Customer View](https://raw.githubusercontent.com/bolensmichael/bamazon/master/img/bamazonCustomer.png "Bamazon Customer View")
 
 ## bamazonManager
-Manager view
+### Manager view
 ![Bamazon Manager View](https://raw.githubusercontent.com/bolensmichael/bamazon/master/img/bamazonManager1.png "Bamazon Manager View")
 
 
