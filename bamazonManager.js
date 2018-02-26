@@ -123,8 +123,7 @@ function updateInventory() {
       }
     }
   ]).then(function(res) {
-    console.log('id: ' + res.id);
-    console.log('quantity: ' + res.quant);
+    console.log('Added ' + res.quant + ' items to product number ' + res.id + '!\n');
     updateItemQuantity(res.id, parseInt(res.quant));
     managerPrompt();
   });
@@ -168,6 +167,7 @@ function newProduct() {
       }
     },
   ]).then(function(res) {
+    console.log('Added ' + res.quant + ' ' + res.name + '(s) priced at $' + parseInt(res.price).toFixed(2) + '\n');
     addProduct(res.name, res.dept, res.price, res.quant);
     managerPrompt();
   });
